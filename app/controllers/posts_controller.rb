@@ -3,7 +3,14 @@ class PostsController < ApplicationController
 
   def new
     @group = Group.find(params[:group_id])
+    if !current_user.is_member_of?(@group)
+      flash[:warning] = "你还不是本群成员，无法发表文章！"
+      redirect_to group_path(@group)
+    end
+
+
     @post = Post.new
+
   end
 
   def create
@@ -17,6 +24,33 @@ class PostsController < ApplicationController
     else
       render :new
     end
+  end
+
+  def destroy
+    @group = Group.find(params[:group_id])
+    @post = Post.find(params[:id])
+
+
+
+    @post.destroy
+
+    redirect_to group_path(@group)
+  end
+
+  def edit
+    @group = Group.find(params[:group_id])
+    @post = Post.find(params[:id])
+
+    @post = Post.new
+  end
+
+  def update
+    @group = Group.find(params[:group_id])
+    @post = Post.find(params[:id])
+
+    @post.update(post_params)
+
+    redirect_to group_path(@group)
   end
 
   private
